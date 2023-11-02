@@ -1,0 +1,2 @@
+C:\My projects\Kinematics\obj\Debug\Assembly-CSharp.csproj.AssemblyReference.cache
+C:\My projects\Kinematics\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache

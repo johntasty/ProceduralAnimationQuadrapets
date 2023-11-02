@@ -1,0 +1,42 @@
+﻿// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel FunctionKernel
+static const int threadGroupSize = 1024;
+
+struct Birds 
+{
+	float3 position;
+	float3 target;
+	float3 velocity;
+	float3 forward;
+	
+};
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWStructuredBuffer<Birds> birds;
+
+int numBirds;
+float _Time;
+float maxspeed;
+float maxSteerForce;
+[numthreads(threadGroupSize,1,1)]
+void FunctionKernel(uint3 id: SV_DispatchThreadID)
+{
+	for (int indexB = 0; indexB < numBirds; indexB++) {
+		if (id.x != indexB) {
+
+			Birds birdB = birds[indexB];
+			float3 offset = birdB.target - birds[id.x].position;
+			float3 accelaration = normalize(offset) * maxspeed - birds[id.x].velocity;
+			float movementSpeed = length(accelaration);
+			movementSpeed = clamp(movementSpeed, 1.0, maxSteerForce);
+			float3 movementVelocity = birds[id.x].velocity + movementSpeed * _Time;
+			float speed = length(movementVelocity);
+			float3 dir = movementVelocity / speed;
+			speed = clamp(speed, 1.0, maxspeed);
+			birds[id.x].velocity = dir * speed;
+
+			birds[id.x].position += birds[id.x].velocity * _Time;
+			birds[id.x].forward = dir;
+		}
+	}
+}
